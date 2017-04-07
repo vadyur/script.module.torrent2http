@@ -2,6 +2,8 @@
 from ..error import Error
 from ..util import ensure_fs_encoding
 
+from ..local.localengine import LocalEngine
+
 import filesystem, log
 import json, base64, urllib, os, time
 
@@ -53,7 +55,7 @@ class RemoteProcess:
 		requests.get(url, params={'pid': self.engine.process.pid})
 
 		
-class ClientEngine(Engine):
+class ClientEngine(LocalEngine):
 
 	def __init__(self, *args, **kwargs):
 		from remotesettings import Settings
@@ -61,7 +63,7 @@ class ClientEngine(Engine):
 
 		kwargs['bind_host'] = self.settings.remote_host
 
-		Engine.__init__(self, *args, **kwargs)
+		LocalEngine.__init__(self, *args, **kwargs)
 		
 		arg_names = ['uri', 'binaries_path', 'platform', 'download_path',
                  'bind_host', 'bind_port', 'connections_limit', 'download_kbps', 'upload_kbps',
@@ -286,8 +288,7 @@ class ClientEngine(Engine):
 		if url and pid:
 			requests.get(url, params={'pid': pid})
 
-			
-class ServerEngine(Engine):
+class ServerEngine(LocalEngine):
 	def __init__(self, **kwargs):
 		from remotesettings import Settings
 		self.settings = Settings()
@@ -302,7 +303,7 @@ class ServerEngine(Engine):
 			log.debug('resume_file is: ' + kwargs['resume_file'])
 
 		kwargs['bind_host'] = self.settings.remote_host
-		Engine.__init__(self, **kwargs)
+		LocalEngine.__init__(self, **kwargs)
 
 	'''
 	def can_bind(self, host, port):

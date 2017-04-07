@@ -22,4 +22,18 @@ class Settings:
 
 		self.binaries_path = _bin_dir
 
+
+		self.use_global = bool(_addon.getSetting("remote_port") == 'true')
+
+		self.upload_limit      = int(_addon.getSetting("upload_limit"))
+		self.download_limit    = int(_addon.getSetting("download_limit"))
+		self.encryption        = bool(_addon.getSetting("encryption") == 'true')
+		self.connections_limit = int(_addon.getSetting("connections_limit"))
+		self.listen_port       = int(_addon.getSetting("listen_port"))
+		self.use_random_port   = bool(_addon.getSetting("use_random_port") == 'true')
+		self.pre_buffer_bytes  = int(_addon.getSetting("pre_buffer_bytes"))
+
 		xbmc.log(str(self.__dict__))
+
+	def __getitem__(self, key):
+		return self.__dict__[key]
