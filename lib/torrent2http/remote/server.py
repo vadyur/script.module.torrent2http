@@ -170,6 +170,12 @@ class HTTP:
 		engn = self.engine()
 		self.engines.remove(engn)
 
+		try:
+			from ..local.localengine import LocalEngine
+			LocalEngine.close(engn, False)
+		except BaseException as e:
+			print_tb(e)
+
 	def close_me(self):
 		engn = self.engine()
 		engn.process.terminate()

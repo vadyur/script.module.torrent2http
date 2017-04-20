@@ -47,7 +47,7 @@ try:
 	if s.role == 'client':
 		from remote.remoteengine import ClientEngine as Engine
 	else:
-		from engine import Engine
+		from local.localengine import LocalEngine as Engine
 except:
 	from engine import Engine
 

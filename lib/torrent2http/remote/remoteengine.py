@@ -58,8 +58,7 @@ class RemoteProcess:
 class ClientEngine(LocalEngine):
 
 	def __init__(self, *args, **kwargs):
-		from remotesettings import Settings
-		self.settings = Settings()
+		self.LoadSettings()
 
 		kwargs['bind_host'] = self.settings.remote_host
 
@@ -193,6 +192,7 @@ class ClientEngine(LocalEngine):
 			self._log("Can't bind to %s:%s, so we found another port: %d" % (self.bind_host, self.bind_port, port))
 			self.bind_port = port
 		'''
+		LocalEngine.start(self, start_index, False)
 			
 		kwargs = {
 			'--bind': "%s:%s" % (self.bind_host, self.bind_port),
@@ -283,16 +283,16 @@ class ClientEngine(LocalEngine):
 			url = "http://%s:%d/close" % (self.settings.remote_host, self.settings.remote_port)
 			pid = self.process.pid
 			
-		Engine.close(self)
+		#Engine.close(self)
 		
 		if url and pid:
 			requests.get(url, params={'pid': pid})
 
+		LocalEngine.close(self)
+
 class ServerEngine(LocalEngine):
 	def __init__(self, **kwargs):
-		from remotesettings import Settings
-		self.settings = Settings()
-
+		self.LoadSettings()
 		if 'resume_file' in kwargs:
 			resume_path = filesystem.join(self.settings.storage_path, '.resume')
 			if not filesystem.exists(resume_path):
@@ -304,11 +304,6 @@ class ServerEngine(LocalEngine):
 
 		kwargs['bind_host'] = self.settings.remote_host
 		LocalEngine.__init__(self, **kwargs)
-
-	'''
-	def can_bind(self, host, port):
-		return True
-	'''
 
 	def pid(self):
 		try:
