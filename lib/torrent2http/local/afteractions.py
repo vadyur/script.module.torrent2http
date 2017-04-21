@@ -107,6 +107,7 @@ class Runner(object):
 			self.process_params()
 			self.run()
 		"""
+		settings = self.settings
 
 		if settings.remove_files:
 			debug('Runner: remove_files')
