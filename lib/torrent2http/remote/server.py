@@ -222,7 +222,7 @@ class HTTP:
 			
 			host = ''
 			debug('find_free_port: ')
-			return str(find_free_port(host))
+			return str(find_free_port(host, xrange(5001, 5100)))
 		except BaseException as e:
 			print_tb(e)
 			return "0"

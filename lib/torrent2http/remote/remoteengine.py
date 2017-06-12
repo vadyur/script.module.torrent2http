@@ -177,7 +177,18 @@ class ClientEngine(Engine):
 		from torrent2http import FileStatus
 		
 		try:
-			return FileStatus(index=fs.index, name=fs.name, save_path=fs.save_path, url=fs.url.replace('0.0.0.0', self.settings.remote_host),
+			url = None
+			if fs.url:
+				import urlparse, re
+				res = urlparse.urlparse(fs.url)
+				port = re.search(r':(\d+)', res.netloc).group(1)
+
+				res = urlparse.ParseResult(res.scheme, 
+											'%s:%s' % (self.settings.remote_host, port), 
+											res.path, res.params, res.query, res.fragment)
+				url=urlparse.urlunparse(res)
+
+			return FileStatus(index=fs.index, name=fs.name, save_path=fs.save_path, url=url,
 		                  size=fs.size, offset=fs.offset, download=fs.download, progress=fs.progress, media_type=fs.media_type)
 		except:
 			return None
