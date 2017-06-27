@@ -1,6 +1,10 @@
 #import sys
 import os
-import xbmc, xbmcgui, xbmcvfs, xbmcaddon
+try:
+    import xbmc, xbmcgui, xbmcvfs, xbmcaddon
+except ImportError:
+    import standalone.xbmc, standalone.xbmcgui, standalone.xbmcvfs, standalone.xbmcaddon
+	
 from net import HTTP
 
 __libbaseurl__ = "https://github.com/DiMartinoXBMC/script.module.torrent2http/raw/master/bin"
