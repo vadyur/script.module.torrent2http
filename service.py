@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import xbmc, sys
+import sys
+
+try:
+	import xbmc
+except ImportError:
+	import standalone.xbmc
 
 from lib.torrent2http.remote.server import Server
 from lib.torrent2http.remote.log import debug
