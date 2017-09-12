@@ -110,6 +110,7 @@ class LocalEngine(Engine):
 		return None
 
 	def get_playable_name(self):
+		import os
 		from afteractions import TorrentInfo
 		info = TorrentInfo.get_torrent_info(self.torrent_path)
 
