@@ -477,7 +477,8 @@ class Engine:
             finished = False
             if self.wait_on_close_timeout is not None:
                 start = time.time()
-                os.close(self.logpipe.write_fd)
+                if self.logpipe:
+                    os.close(self.logpipe.write_fd)
                 while (time.time() - start) < self.wait_on_close_timeout:
                     time.sleep(0.5)
                     if not self.is_alive():
