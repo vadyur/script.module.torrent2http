@@ -28,6 +28,5 @@ class LogPipe(threading.Thread):
 
     def close(self):
         self.stop.set()
-        f = os.fdopen(self.write_fd, "w")
-        f.write("Stopping logging thread...\n")
-        f.close()
+        with os.fdopen(self.write_fd, "w") as f:
+            f.write("Stopping logging thread...\n")

@@ -205,10 +205,10 @@ class ClientEngine(LocalEngine):
 			'--enable-upnp': self.enable_upnp,
 			'--enable-scrape': self.enable_scrape,
 			'--encryption': self.encryption,
-			'--show-stats': self.log_stats,
-			'--files-progress': self.log_files_progress,
-			'--overall-progress': self.log_overall_progress,
-			'--pieces-progress': self.log_pieces_progress,
+			#'--show-stats': self.log_stats,
+			#'--files-progress': self.log_files_progress,
+			#'--overall-progress': self.log_overall_progress,
+			#'--pieces-progress': self.log_pieces_progress,
 			'--listen-port': self.listen_port,
 			'--random-port': self.use_random_port,
 			'--keep-complete': self.keep_complete,
@@ -230,6 +230,7 @@ class ClientEngine(LocalEngine):
 			'--max-failcount': self.max_failcount,
 			'--dht-routers': ",".join(self.dht_routers),
 			'--trackers': ",".join(self.trackers),
+			'--buffer': self.buffer
 		}
 
 		args = []
