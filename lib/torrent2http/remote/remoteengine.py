@@ -2,6 +2,8 @@
 from ..error import Error
 from ..util import ensure_fs_encoding
 
+from ..local.localengine import LocalEngine
+
 import filesystem, log
 import json, base64, urllib, os, time
 
@@ -53,31 +55,16 @@ class RemoteProcess:
 		requests.get(url, params={'pid': self.engine.process.pid})
 
 		
-class ClientEngine(Engine):
+class ClientEngine(LocalEngine):
 
 	def __init__(self, *args, **kwargs):
-		from remotesettings import Settings
-		self.settings = Settings()
+		self.LoadSettings()
 
 		kwargs['bind_host'] = self.settings.remote_host
 
-		Engine.__init__(self, *args, **kwargs)
+		LocalEngine.__init__(self, *args, **kwargs)
 		
-		arg_names = ['uri', 'binaries_path', 'platform', 'download_path',
-                 'bind_host', 'bind_port', 'connections_limit', 'download_kbps', 'upload_kbps',
-                 'enable_dht', 'enable_lsd', 'enable_natpmp', 'enable_upnp', 'enable_scrape',
-                 'log_stats', 'encryption', 'keep_complete', 'keep_incomplete',
-                 'keep_files', 'log_files_progress', 'log_overall_progress', 'log_pieces_progress',
-                 'listen_port', 'use_random_port', 'max_idle_timeout', 'no_sparse', 'resume_file',
-                 'user_agent', 'startup_timeout', 'state_file', 'enable_utp', 'enable_tcp',
-                 'debug_alerts', 'logger', 'torrent_connect_boost', 'connection_speed',
-                 'peer_connect_timeout', 'request_timeout', 'min_reconnect_time', 'max_failcount',
-                 'dht_routers', 'trackers']
-			
-		i = 0
-		for arg in args:
-			kwargs[arg_names[i]] = arg
-			i += 1
+		kwargs = self.args2kwargs(*args, **kwargs)
 		
 		self.sobj = ClientEngine.toJSON(kwargs)
 
@@ -202,6 +189,7 @@ class ClientEngine(Engine):
 			self._log("Can't bind to %s:%s, so we found another port: %d" % (self.bind_host, self.bind_port, port))
 			self.bind_port = port
 		'''
+		LocalEngine.start(self, start_index, False)
 			
 		kwargs = {
 			'--bind': "%s:%s" % (self.bind_host, self.bind_port),
@@ -217,10 +205,10 @@ class ClientEngine(Engine):
 			'--enable-upnp': self.enable_upnp,
 			'--enable-scrape': self.enable_scrape,
 			'--encryption': self.encryption,
-			'--show-stats': self.log_stats,
-			'--files-progress': self.log_files_progress,
-			'--overall-progress': self.log_overall_progress,
-			'--pieces-progress': self.log_pieces_progress,
+			#'--show-stats': self.log_stats,
+			#'--files-progress': self.log_files_progress,
+			#'--overall-progress': self.log_overall_progress,
+			#'--pieces-progress': self.log_pieces_progress,
 			'--listen-port': self.listen_port,
 			'--random-port': self.use_random_port,
 			'--keep-complete': self.keep_complete,
@@ -242,6 +230,7 @@ class ClientEngine(Engine):
 			'--max-failcount': self.max_failcount,
 			'--dht-routers': ",".join(self.dht_routers),
 			'--trackers': ",".join(self.trackers),
+			'--buffer': self.buffer
 		}
 
 		args = []
@@ -292,17 +281,16 @@ class ClientEngine(Engine):
 			url = "http://%s:%d/close" % (self.settings.remote_host, self.settings.remote_port)
 			pid = self.process.pid
 			
-		Engine.close(self)
+		#Engine.close(self)
 		
 		if url and pid:
 			requests.get(url, params={'pid': pid})
 
-			
-class ServerEngine(Engine):
-	def __init__(self, **kwargs):
-		from remotesettings import Settings
-		self.settings = Settings()
+		LocalEngine.close(self)
 
+class ServerEngine(LocalEngine):
+	def __init__(self, **kwargs):
+		self.LoadSettings()
 		if 'resume_file' in kwargs:
 			resume_path = filesystem.join(self.settings.storage_path, '.resume')
 			if not filesystem.exists(resume_path):
@@ -313,12 +301,7 @@ class ServerEngine(Engine):
 			log.debug('resume_file is: ' + kwargs['resume_file'])
 
 		kwargs['bind_host'] = self.settings.remote_host
-		Engine.__init__(self, **kwargs)
-
-	'''
-	def can_bind(self, host, port):
-		return True
-	'''
+		LocalEngine.__init__(self, **kwargs)
 
 	def pid(self):
 		try:

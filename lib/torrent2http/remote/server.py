@@ -21,7 +21,7 @@ _JS_ = '''
 function close_procces(pid) {
 	var x = new XMLHttpRequest();
 
-	x.open("GET", "/close_me?pid=" + pid, true);
+	x.open("GET", "/force_close?pid=" + pid, true);
 	x.send(null);
 }
 '''
@@ -170,7 +170,13 @@ class HTTP:
 		engn = self.engine()
 		self.engines.remove(engn)
 
-	def close_me(self):
+		try:
+			from ..local.localengine import LocalEngine
+			LocalEngine.close(engn, False)
+		except BaseException as e:
+			print_tb(e)
+
+	def force_close(self):
 		engn = self.engine()
 		engn.process.terminate()
 		engn.close()
@@ -179,16 +185,20 @@ class HTTP:
 	def poll(self):
 		try:
 			return str(self.engine().process.poll())
+		except AttributeError:
+			pass
 		except BaseException as e:
 			print_tb(e)
-			return "None"
+		return "None"
 			
 	def wait(self):
 		try:
 			return str(self.engine().process.wait())
+		except AttributeError:
+			pass
 		except BaseException as e:
 			print_tb(e)
-			return "0"
+		return "0"
 
 	def terminate(self):
 		try:
@@ -258,7 +268,7 @@ class Server:
 		app.route('/kill', callback=self.http.kill)
 
 		app.route('/close', callback=self.http.close)
-		app.route('/close_me', callback=self.http.close_me)
+		app.route('/force_close', callback=self.http.force_close)
 
 		#debug('host: ' + s.remote_host)
 		#debug('port: ' + s.remote_port)

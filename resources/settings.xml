@@ -2,9 +2,42 @@
 <settings>
     <category label="Основные">
         <setting label="Роль" type="select" id="role" values="local|server|client" default="local"/>
-		<setting label="Путь для сохранения видео файлов"	type="folder" id="storage_path"	visible="eq(-1,server)" />
+		    <setting label="Путь для сохранения видео файлов"	type="folder" id="storage_path"	visible="eq(-1,server)" />
 
-		<setting label="Хост" type="text"   id="remote_host"	visible="!eq(-2,local)" default="192.168.1.10"/>		
-		<setting label="Порт" type="text"   id="remote_port" 	visible="!eq(-3,local)" default="2829"/>		
+		    <setting label="Хост" type="text"   id="remote_host"	visible="!eq(-2,local)" default="192.168.1.10"/>		
+		    <setting label="Порт" type="text"   id="remote_port" 	visible="!eq(-3,local)" default="2829"/>
+
+        <setting label="Использовать глобальные настройки" 		type="bool"   id="use_global" 		default="false"/>
+      
+          <setting id="upload_limit"      type="number"   label="Ограничить скорость раздачи МБит/сек (0 - неограничено)" default="0"       visible="eq(-1,true)"/>
+          <setting id="download_limit"    type="number"   label="Ограничить скорость закачки МБит/сек (0 - неограничено)" default="0"       visible="eq(-2,true)"/>
+          <setting id="encryption"        type="bool"     label="Шифрование" default="true"    visible="eq(-3,true)"/>
+          <setting id="connections_limit" type="number"   label="Макс. соединений (0 - безлимит)" default="200"     visible="eq(-4,true)"/>
+          <setting id="listen_port"       type="number"   label="Порт для входящих соединений" default="6881"    visible="eq(-5,true)"/>
+          <setting id="use_random_port"   type="bool"     label="Использовать случайные порты" default="false"   visible="eq(-5,true)"/>
+          <setting id="use_dht_routers"   type="bool"     label="Использовать DHT utorrent.com, bittorrent.com" default="true"   visible="eq(-6,true)"/>
+          <setting id="change_user_agent"  type="bool"     label="Использовать User-Agent uTorrent" default="true"   visible="eq(-7,true)"/>
+
+      <!-- <setting id="pre_buffer_bytes"  type="slider"   label="Загружаемый объем файла до начала просмотра, Мб" default="25"      visible="eq(-5,true)"  range="5,5,50" option="int"/> -->
     </category>
+
+    <category label="Дополнительно">
+      <!--
+      <setting label="Выполнить скрипт/программу по завершению просмотра" type="bool" id="run_script" default="false"/>
+      <setting label="" type="text"   id="script_params" enable="eq(-1,true)" default="" visible="eq(-1,true)" />
+      <setting label="Можно использовать параметры" type="lsep" visible="eq(-2,true)" />
+      <setting label="    %t - путь к torrent-файлу" type="text" enable="false" visible="eq(-3,true)" />
+      <setting label="    %f - путь к проигрываемому файлу" type="text" enable="false" visible="eq(-4,true)" />
+      <setting label="    %F - путь к проигрываемому файлу, относительно каталага загрузки" type="text" enable="false" visible="eq(-5,true)" />
+      <setting label="    %u - URL раздачи" type="text" enable="false" visible="eq(-6,true)" />
+      <setting label="    %s - короткое имя источника (anidub, hdclub, nnmclub)" type="text" enable="false" visible="eq(-7,true)" />
+      <setting label="    %p - количество загруженного (%)" type="text" enable="false" visible="eq(-8,true)" />
+      <setting label="    %v - тип видео (movie, episode)" type="text" enable="false" visible="eq(-9,true)" />
+      -->
+      <setting label="Видео файлы по завершению просмотра" type="select" id="action_files" values="оставить|переместить|удалить" default="оставить"/>
+      <setting label="Путь"	type="folder" id="copy_video_path" 	default="" visible="eq(-1,переместить)" />
+      <setting label="Копировать торрент файлы в" type="bool"   id="copy_torrent" default="false"/>
+      <setting label="Путь"	type="folder" id="copy_torrent_path" 	default="" visible="eq(-1,true)" />
+    </category>
+
 </settings>

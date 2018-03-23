@@ -34,7 +34,7 @@ SessionStatus = namedtuple('SessionStatus', "name, state, state_str, error, prog
                                             "total_download, total_upload, num_peers, num_seeds, total_seeds, "
                                             "total_peers")
 
-FileStatus = namedtuple('FileStatus', "name, save_path, url, size, offset, download, progress, index, media_type")
+FileStatus = namedtuple('FileStatus', "name, save_path, url, size, offset, download, progress, index, media_type, buffer")
 
 PeerInfo = namedtuple('PeerInfo', "ip, flags, source, up_speed, down_speed, total_upload, total_download, "
                                   "country, client")
@@ -47,7 +47,7 @@ try:
 	if s.role == 'client':
 		from remote.remoteengine import ClientEngine as Engine
 	else:
-		from engine import Engine
+		from local.localengine import LocalEngine as Engine
 except:
 	from engine import Engine
 

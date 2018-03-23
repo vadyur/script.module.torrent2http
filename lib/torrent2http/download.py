@@ -7,7 +7,7 @@ except ImportError:
 	
 from net import HTTP
 
-__libbaseurl__ = "https://github.com/DiMartinoXBMC/script.module.torrent2http/raw/master/bin"
+__libbaseurl__ = "https://github.com/vadyur/script.module.torrent2http/raw/bin/bin"
 __settings__ = xbmcaddon.Addon(id='script.module.torrent2http')
 __version__ = __settings__.getAddonInfo('version')
 __plugin__ = __settings__.getAddonInfo('name') + " v." + __version__

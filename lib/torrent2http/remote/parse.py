@@ -5,9 +5,22 @@ def path2url(path):
 	return urlparse.urljoin('file:', urllib.pathname2url(path))
 
 
-def remote_t2h_torrent_path():
+def remote_t2h_torrent_path(torrent_data):
+	default = 'rt2h'
+
+	from ..local.bencode import BTFailure, bdecode, bencode
+	try:
+		decoded = bdecode(torrent_data)
+		info = decoded['info']
+
+		import hashlib
+		default = hashlib.sha1(bencode(info)).hexdigest()
+
+	except BTFailure:
+		pass
+
 	import xbmc
-	return xbmc.translatePath('special://temp/rt2h.torrent')
+	return xbmc.translatePath('special://temp/%s.torrent' % default)
 
 	
 def parse(argv, s):
@@ -33,7 +46,7 @@ def parse(argv, s):
 
 	torrent_path = None
 	if torrent_data:
-		torrent_path = remote_t2h_torrent_path()
+		torrent_path = remote_t2h_torrent_path(torrent_data)
 		with open(torrent_path, 'wb') as t:
 			t.write(torrent_data)
 
