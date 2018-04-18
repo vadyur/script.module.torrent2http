@@ -42,12 +42,15 @@ class LocalEngine(Engine):
 
 			self.torrent_path = None
 			uri = kwargs['uri']
+			from urllib import url2pathname
 			if uri.startswith('file:'):
 				uri = uri.replace('file:', '')
-				from urllib import url2pathname
 				self.torrent_path = url2pathname(uri)
 			elif uri.startswith('http:') or uri.startswith('https:'):
 				# download torrent
+				uri = self._get_uri(uri)
+				self.torrent_path = url2pathname(uri)
+				"""
 				from urllib2 import urlopen
 				h = urlopen(uri)
 				self.torrent_path = 'tt.torrent'
@@ -57,6 +60,7 @@ class LocalEngine(Engine):
 				with filesystem.fopen(self.torrent_path, 'wb') as t:
 					from shutil import copyfileobj
 					copyfileobj(h, t)
+				"""
 
 			if not self.torrent_path:
 				self.settings.copy_torrent = False

@@ -221,7 +221,6 @@ class Engine:
 				with open(path, 'wb') as fd:
 					for chunk in res.iter_content(chunk_size=1024):
 						fd.write(chunk)
-					self.temp_torrent = path
 					from remote.parse import path2url
 					uri = path2url(path)
 
