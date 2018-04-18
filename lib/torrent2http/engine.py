@@ -210,6 +210,22 @@ class Engine:
 		self.started = False
 		self.buffer = buffer
 
+	def _get_uri(self, uri):
+
+		if uri.startswith('http'):
+			import requests
+			res = requests.get(uri)
+			if res.ok:
+				import xbmc
+				path = xbmc.translatePath('special://temp/torrent2http.torrent')
+				with open(path, 'wb') as fd:
+					for chunk in res.iter_content(chunk_size=1024):
+						fd.write(chunk)
+					from remote.parse import path2url
+					uri = path2url(path)
+
+		return uri
+
 	@staticmethod
 	def _validate_save_path(path):
 		"""
@@ -249,7 +265,7 @@ class Engine:
 
 		kwargs = {
 			'--bind': "%s:%s" % (self.bind_host, self.bind_port),
-			'--uri': self.uri,
+			'--uri': self._get_uri( self.uri ),
 			'--file-index': start_index,
 			'--dl-path': download_path,
 			'--connections-limit': self.connections_limit,

@@ -14,7 +14,14 @@ except ImportError:
 	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.requests","lib")
 	if os.path.exists(req_path):
 		sys.path.append(req_path)
+	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.urllib3", "lib")
+	if os.path.exists(req_path):
+		sys.path.append(req_path)
+	try:
 		import requests
+	except ImportError:
+		pass
+
 
 class RemoteProcess:
 
@@ -176,7 +183,7 @@ class ClientEngine(LocalEngine):
 				url=urlparse.urlunparse(res)
 
 			return FileStatus(index=fs.index, name=fs.name, save_path=fs.save_path, url=url,
-		                  size=fs.size, offset=fs.offset, download=fs.download, progress=fs.progress, media_type=fs.media_type)
+		                  size=fs.size, offset=fs.offset, download=fs.download, progress=fs.progress, media_type=fs.media_type, buffer=fs.buffer)
 		except:
 			return None
 
@@ -193,7 +200,7 @@ class ClientEngine(LocalEngine):
 			
 		kwargs = {
 			'--bind': "%s:%s" % (self.bind_host, self.bind_port),
-			'--uri': self.uri,
+			'--uri': self._get_uri( self.uri ),
 			'--file-index': start_index,
 			#'--dl-path': download_path,
 			'--connections-limit': self.connections_limit,
