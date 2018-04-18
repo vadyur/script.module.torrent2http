@@ -15,7 +15,7 @@ import logpipe
 import mimetypes
 import xbmc
 from error import Error
-from platform import Platform
+from platform1 import Platform
 from . import SessionStatus, FileStatus, PeerInfo, MediaType, Encryption
 from util import can_bind, find_free_port, ensure_fs_encoding
 

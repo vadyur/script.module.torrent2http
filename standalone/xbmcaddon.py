@@ -8,7 +8,12 @@ import xml.etree.ElementTree as ET
 # ------------------------------------------------------------------------------------------------------------------- #
 class AddonRO(object):
 	def __init__(self, id=None, xml_filename='settings.xml'):
-		self._addon_xml 	= xml_filename
+		import sys
+		if getattr(sys, 'frozen', False):
+			current = os.path.dirname(sys.executable)
+			self._addon_xml 	= os.path.join(current, xml_filename)
+		else:
+			self._addon_xml 	= xml_filename
 		self.load()
 
 

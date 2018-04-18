@@ -51,5 +51,5 @@ try:
 except:
 	from engine import Engine
 
-from platform import Platform
+from platform1 import Platform
 from error import Error
