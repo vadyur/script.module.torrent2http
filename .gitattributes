@@ -8,3 +8,4 @@
 *.exe export-ignore
 .gitattributes export-ignore  
 .gitignore export-ignore
+standalone.spec export-ignore

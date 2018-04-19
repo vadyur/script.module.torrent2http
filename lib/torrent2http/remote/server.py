@@ -42,7 +42,10 @@ def _TR_(val):
 
 
 def statgui():
-	current = os.path.dirname(__file__)
+	if getattr(sys, 'frozen', False):
+		current = os.path.dirname(sys.executable)
+	else:
+		current = os.path.dirname(__file__)
 
 	text = ''
 	with open(os.path.join(current, 'statgui.css'), 'r') as css:

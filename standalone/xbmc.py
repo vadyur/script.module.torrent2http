@@ -1,4 +1,4 @@
-﻿import os
+﻿import os, sys
 
 LOGDEBUG = 0
 LOGERROR = 4
@@ -15,10 +15,14 @@ def translatePath(path):
 	if not path.startswith('special:'):
 		return path
 	
-	current = os.path.dirname(__file__)
-	root = os.path.abspath(os.path.join(current, os.pardir, os.pardir))
+	if getattr(sys, 'frozen', False):
+		# frozen
+		current = os.path.dirname(sys.executable)
+	else:
+		current = os.path.dirname(__file__)
 	
 	if 'special://home/addons' in path:
+		root = os.path.abspath(os.path.join(current, os.pardir, os.pardir))
 		path = path.replace('special://home/addons', '').lstrip('/')
 		path = os.path.join(root, path)
 	elif 'special://temp' in path:

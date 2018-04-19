@@ -242,7 +242,10 @@ class Engine:
 			else:
 				raise Error("Downloading to an unmounted network share is not supported", Error.INVALID_DOWNLOAD_PATH)
 		if not os.path.isdir(ensure_fs_encoding(path)):
-			raise Error("Download path doesn't exist (%s)" % path, Error.INVALID_DOWNLOAD_PATH)
+			try:
+				os.makedirs(ensure_fs_encoding(path))
+			except:
+				raise Error("Download path doesn't exist (%s)" % path, Error.INVALID_DOWNLOAD_PATH)
 		return path
 
 	def start(self, start_index=None):
