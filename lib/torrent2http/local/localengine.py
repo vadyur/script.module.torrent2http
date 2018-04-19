@@ -8,6 +8,13 @@ from ..remote import filesystem
 dht_routers 		= ["router.bittorrent.com:6881","router.utorrent.com:6881"]
 user_agent 			= 'uTorrent/2200(24683)'
 
+def url2pathname(pathname):
+	from urllib import url2pathname as _url2pathname
+
+	result = _url2pathname(pathname)
+	return result.replace('file://', '')
+
+
 class LocalEngine(Engine):
 	def LoadSettings(self):
 		from ..remote.remotesettings import Settings
@@ -42,7 +49,6 @@ class LocalEngine(Engine):
 
 			self.torrent_path = None
 			uri = kwargs['uri']
-			from urllib import url2pathname
 			if uri.startswith('file:'):
 				uri = uri.replace('file:', '')
 				self.torrent_path = url2pathname(uri)
@@ -50,17 +56,6 @@ class LocalEngine(Engine):
 				# download torrent
 				uri = self._get_uri(uri)
 				self.torrent_path = url2pathname(uri)
-				"""
-				from urllib2 import urlopen
-				h = urlopen(uri)
-				self.torrent_path = 'tt.torrent'
-				if filesystem.exists(self.torrent_path):
-					filesystem.remove(self.torrent_path)
-
-				with filesystem.fopen(self.torrent_path, 'wb') as t:
-					from shutil import copyfileobj
-					copyfileobj(h, t)
-				"""
 
 			if not self.torrent_path:
 				self.settings.copy_torrent = False
