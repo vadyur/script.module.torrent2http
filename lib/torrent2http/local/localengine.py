@@ -12,7 +12,7 @@ def url2pathname(pathname):
 	from urllib import url2pathname as _url2pathname
 
 	result = _url2pathname(pathname)
-	return result.replace('file://', '')
+	return result.replace('file://', '').replace('file:', '')
 
 
 class LocalEngine(Engine):
@@ -50,7 +50,6 @@ class LocalEngine(Engine):
 			self.torrent_path = None
 			uri = kwargs['uri']
 			if uri.startswith('file:'):
-				uri = uri.replace('file:', '')
 				self.torrent_path = url2pathname(uri)
 			elif uri.startswith('http:') or uri.startswith('https:'):
 				# download torrent

@@ -89,10 +89,14 @@ class Engine:
 				if not os.path.exists(android_binary_dir):
 					os.makedirs(android_binary_dir)
 				android_binary_path = os.path.join(android_binary_dir, binary)
+				android_library_path = os.path.join(android_binary_dir, 'libgnustl_shared.so')
+				library_path = os.path.join(binary_dir, 'libgnustl_shared.so')
 				if not os.path.exists(android_binary_path) or \
+					not os.path.exists(android_library_path) or \
 						int(os.path.getmtime(android_binary_path)) < int(os.path.getmtime(binary_path)):
 					import shutil
 					shutil.copy2(binary_path, android_binary_path)
+					shutil.copy2(library_path, android_library_path)
 					if not self._ensure_binary_executable(android_binary_path):
 						raise Error("Can't make %s executable" % android_binary_path, Error.NOEXEC_FILESYSTEM)
 				binary_path = android_binary_path
