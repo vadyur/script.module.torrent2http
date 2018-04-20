@@ -95,15 +95,19 @@ class Engine:
 						fp.seek(-40, os.SEEK_END)  # we put a sha1 there
 						return fp.read()
 
-				binary_dir_legacy = binary_dir.replace("/storage/emulated/0", "/storage/emulated/legacy")
-				if os.path.exists(binary_dir_legacy):
-					binary_dir = binary_dir_legacy
-				xbmc.log("Using binary folder: %s" % binary_dir)
-				app_id = android_get_current_appid()
-				xbmc_data_path = os.path.join("/data", "data", app_id)
+				self._log("Trying to copy torrent2http to ext4, since the sdcard is noexec...")
+				xbmc_home = os.environ.get('XBMC_HOME') or os.environ.get('KODI_HOME')
+				if not xbmc_home:
+					raise Error("Suppose we are running XBMC, but environment variable "
+								"XBMC_HOME or KODI_HOME is not found", Error.XBMC_HOME_NOT_DEFINED)
+				base_xbmc_path = dirname(dirname(dirname(xbmc_home)))
+				self._log("base_xbmc_path: {}".format(base_xbmc_path))
 
-				android_binary_dir = os.path.join(xbmc_data_path, "files", plugin.id, "bin", "%(os)s_%(arch)s" % platform)
+				android_binary_dir = os.path.join(base_xbmc_path, "files", "bin")
+				self._log("android_binary_dir: {}".format(android_binary_dir))
+
 				android_binary_path = os.path.join(android_binary_dir, binary)
+				self._log("android_binary_path: {}".format(android_binary_path))
 
 				if not os.path.exists(android_binary_path) or get_t2h_checksum(binary_path) != get_t2h_checksum(android_binary_path):
 					import shutil
@@ -114,12 +118,12 @@ class Engine:
 					try:
 						shutil.rmtree(android_binary_dir)
 					except OSError as e:
-						plugin.log.error("Unable to remove destination path for update: %s" % e)
+						self._log("Unable to remove destination path for update: %s" % e)
 						pass
 					try:
 						shutil.copytree(binary_dir, android_binary_dir)
 					except OSError as e:
-						plugin.log.error("Unable to copy to destination path for update: %s" % e)
+						self._log("Unable to copy to destination path for update: %s" % e)
 						pass
 
 				binary_path = android_binary_path
