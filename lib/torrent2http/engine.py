@@ -135,7 +135,7 @@ class Engine:
 				raise Error("Can't make %s executable, ensure it's placed on exec partition and "
 							"partition is in read/write mode" % binary_path, Error.NOEXEC_FILESYSTEM)
 		self._log("Selected %s as torrent2http binary" % binary_path)
-		return binary_path
+		return binary_path, binary_dir
 
 	def __init__(self, uri=None, binaries_path=None, platform=None, download_path=".",
 					bind_host='127.0.0.1', bind_port=5001, connections_limit=None, download_kbps=None, upload_kbps=None,
@@ -292,7 +292,7 @@ class Engine:
 			any file requested
 		"""
 		self.platform = self.platform or Platform()
-		binary_path = self._get_binary_path(self.binaries_path)
+		binary_path, torrent2http_dir = self._get_binary_path(self.binaries_path)
 		download_path = self._validate_save_path(self.download_path)
 		if not can_bind(self.bind_host, self.bind_port):
 			port = find_free_port(self.bind_host)
@@ -361,14 +361,22 @@ class Engine:
 
 		self._log("Invoking %s" % " ".join(args))
 		startupinfo = None
+		kwargs = {}
 		if self.platform.system == "windows":
 			startupinfo = subprocess.STARTUPINFO()
 			startupinfo.dwFlags |= 1
 			startupinfo.wShowWindow = 0
+		else:
+			env = os.environ.copy()
+			env["LD_LIBRARY_PATH"] = "%s:%s" % (
+				torrent2http_dir, env.get("LD_LIBRARY_PATH", ""))
+			kwargs["env"] = env
+			kwargs["close_fds"] = True
+			kwargs["cwd"] = torrent2http_dir
 
 		self.logpipe = logpipe.LogPipe(self._log)
 		try:
-			self.process = subprocess.Popen(args, stderr=self.logpipe, stdout=self.logpipe, startupinfo=startupinfo)
+			self.process = subprocess.Popen(args, stderr=self.logpipe, stdout=self.logpipe, startupinfo=startupinfo, **kwargs)
 		except OSError, e:
 			raise Error("Can't start torrent2http: %r" % e, Error.POPEN_ERROR)
 
