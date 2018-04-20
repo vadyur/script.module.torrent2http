@@ -94,10 +94,15 @@ class Engine:
 				if not os.path.exists(android_binary_path) or \
 					not os.path.exists(android_library_path) or \
 						int(os.path.getmtime(android_binary_path)) < int(os.path.getmtime(binary_path)):
-					import shutil
-					shutil.copy2(binary_path, android_binary_path)
-					shutil.copy2(library_path, android_library_path)
-					if not self._ensure_binary_executable(android_binary_path):
+					try:
+						import shutil
+						self._log('Copy files from {} to {}'.format(binary_dir, android_binary_dir))
+						shutil.copytree(binary_dir, android_binary_dir)
+					except OSError as e:
+						self._log("Unable to copy to destination path for update: %s" % e)
+						pass
+
+				if not self._ensure_binary_executable(android_binary_path):
 						raise Error("Can't make %s executable" % android_binary_path, Error.NOEXEC_FILESYSTEM)
 				binary_path = android_binary_path
 			else:
