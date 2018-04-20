@@ -79,32 +79,52 @@ class Engine:
 
 		if not self._ensure_binary_executable(binary_path):
 			if self.platform.system == "android":
-				self._log("Trying to copy torrent2http to ext4, since the sdcard is noexec...")
-				xbmc_home = os.environ.get('XBMC_HOME') or os.environ.get('KODI_HOME')
-				if not xbmc_home:
-					raise Error("Suppose we are running XBMC, but environment variable "
-								"XBMC_HOME or KODI_HOME is not found", Error.XBMC_HOME_NOT_DEFINED)
-				base_xbmc_path = dirname(dirname(dirname(xbmc_home)))
-				android_binary_dir = os.path.join(base_xbmc_path, "files")
-				if not os.path.exists(android_binary_dir):
-					os.makedirs(android_binary_dir)
+
+				def android_get_current_appid():
+					with open("/proc/%d/cmdline" % os.getpid()) as fp:
+						return fp.read().rstrip("\0")
+
+
+				def ensure_exec_perms(file_):
+					st = os.stat(file_)
+					os.chmod(file_, st.st_mode | stat.S_IEXEC)
+					return file_
+
+				def get_t2h_checksum(path):
+					with open(path) as fp:
+						fp.seek(-40, os.SEEK_END)  # we put a sha1 there
+						return fp.read()
+
+				binary_dir_legacy = binary_dir.replace("/storage/emulated/0", "/storage/emulated/legacy")
+				if os.path.exists(binary_dir_legacy):
+					binary_dir = binary_dir_legacy
+				xbmc.log("Using binary folder: %s" % binary_dir)
+				app_id = android_get_current_appid()
+				xbmc_data_path = os.path.join("/data", "data", app_id)
+
+				android_binary_dir = os.path.join(xbmc_data_path, "files", plugin.id, "bin", "%(os)s_%(arch)s" % platform)
 				android_binary_path = os.path.join(android_binary_dir, binary)
-				android_library_path = os.path.join(android_binary_dir, 'libgnustl_shared.so')
-				library_path = os.path.join(binary_dir, 'libgnustl_shared.so')
-				if not os.path.exists(android_binary_path) or \
-					not os.path.exists(android_library_path) or \
-						int(os.path.getmtime(android_binary_path)) < int(os.path.getmtime(binary_path)):
+
+				if not os.path.exists(android_binary_path) or get_t2h_checksum(binary_path) != get_t2h_checksum(android_binary_path):
+					import shutil
 					try:
-						import shutil
-						self._log('Copy files from {} to {}'.format(binary_dir, android_binary_dir))
+						os.makedirs(android_binary_dir)
+					except OSError:
+						pass
+					try:
+						shutil.rmtree(android_binary_dir)
+					except OSError as e:
+						plugin.log.error("Unable to remove destination path for update: %s" % e)
+						pass
+					try:
 						shutil.copytree(binary_dir, android_binary_dir)
 					except OSError as e:
-						self._log("Unable to copy to destination path for update: %s" % e)
+						plugin.log.error("Unable to copy to destination path for update: %s" % e)
 						pass
 
-				if not self._ensure_binary_executable(android_binary_path):
-						raise Error("Can't make %s executable" % android_binary_path, Error.NOEXEC_FILESYSTEM)
 				binary_path = android_binary_path
+				binary_dir = android_binary_dir
+
 			else:
 				raise Error("Can't make %s executable, ensure it's placed on exec partition and "
 							"partition is in read/write mode" % binary_path, Error.NOEXEC_FILESYSTEM)
