@@ -129,6 +129,8 @@ class Engine:
 				binary_path = android_binary_path
 				binary_dir = android_binary_dir
 
+				ensure_exec_perms(binary_path)
+
 			else:
 				raise Error("Can't make %s executable, ensure it's placed on exec partition and "
 							"partition is in read/write mode" % binary_path, Error.NOEXEC_FILESYSTEM)
