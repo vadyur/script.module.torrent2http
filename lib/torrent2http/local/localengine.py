@@ -11,6 +11,7 @@ user_agent 			= 'uTorrent/2200(24683)'
 def url2pathname(pathname):
 	from urllib import url2pathname as _url2pathname
 
+	pathname = pathname.replace('file:', '')
 	result = _url2pathname(pathname)
 	return result.replace('file://', '').replace('file:', '')
 
