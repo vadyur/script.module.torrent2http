@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import os
 import time
 import re
-import urllib
-import urllib2
-import cookielib
 import base64
-import mimetools
 import itertools
 
 import xbmc
 import xbmcgui
 import xbmcvfs
+
+import sys
+if sys.version_info >= (3, 0):
+    from urllib import request as urllib_request
+    from urllib.parse import urlencode, unquote, quote
+    from http import cookiejar as cookielib
+else:
+    import urllib2 as urllib_request
+    from urllib import urlencode, unquote, quote
+    import cookielib
+
 
 RE = {
     'content-disposition': re.compile('attachment;\sfilename="*([^"\s]+)"|\s')
@@ -45,9 +53,9 @@ class HTTP:
         try:
             self._opener()
             self._fetch()
-        except Exception, e:
+        except Exception as e:
             xbmc.log('XBMCup: HTTP: ' + str(e), xbmc.LOGERROR)
-            if isinstance(e, urllib2.HTTPError):
+            if isinstance(e, urllib_request.HTTPError):
                 self.response.code = e.code
             self.response.error = e
         else:
@@ -73,17 +81,17 @@ class HTTP:
 
     def _opener(self):
 
-        build = [urllib2.HTTPHandler()]
+        build = [urllib_request.HTTPHandler()]
 
         if self.request.redirect:
-            build.append(urllib2.HTTPRedirectHandler())
+            build.append(urllib_request.HTTPRedirectHandler())
 
         if self.request.proxy_host and self.request.proxy_port:
-            build.append(urllib2.ProxyHandler(
+            build.append(urllib_request.ProxyHandler(
                 {self.request.proxy_protocol: self.request.proxy_host + ':' + str(self.request.proxy_port)}))
 
             if self.request.proxy_username:
-                proxy_auth_handler = urllib2.ProxyBasicAuthHandler()
+                proxy_auth_handler = urllib_request.ProxyBasicAuthHandler()
                 proxy_auth_handler.add_password('realm', 'uri', self.request.proxy_username,
                                                 self.request.proxy_password)
                 build.append(proxy_auth_handler)
@@ -93,25 +101,25 @@ class HTTP:
             self.cookies = cookielib.MozillaCookieJar()
             if os.path.isfile(self.request.cookies):
                 self.cookies.load(self.request.cookies)
-            build.append(urllib2.HTTPCookieProcessor(self.cookies))
+            build.append(urllib_request.HTTPCookieProcessor(self.cookies))
 
-        urllib2.install_opener(urllib2.build_opener(*build))
+        urllib_request.install_opener(urllib_request.build_opener(*build))
 
     def _fetch(self):
         params = {} if self.request.params is None else self.request.params
 
         if self.request.upload:
             boundary, upload = self._upload(self.request.upload, params)
-            req = urllib2.Request(self.request.url)
+            req = urllib_request.Request(self.request.url)
             req.add_data(upload)
         else:
 
             if self.request.method == 'POST':
                 if isinstance(params, dict) or isinstance(params, list):
-                    params = urllib.urlencode(params)
-                req = urllib2.Request(self.request.url, params)
+                    params = urlencode(params)
+                req = urllib_request.Request(self.request.url, params)
             else:
-                req = urllib2.Request(self.request.url)
+                req = urllib_request.Request(self.request.url)
 
         for key, value in self.request.headers.iteritems():
             req.add_header(key, value)
@@ -124,8 +132,8 @@ class HTTP:
             req.add_header('Authorization', 'Basic %s' % base64.encodestring(
                 ':'.join([self.request.auth_username, self.request.auth_password])).strip())
 
-        self.con = urllib2.urlopen(req, timeout=self.request.timeout)
-        # self.con = urllib2.urlopen(req)
+        self.con = urllib_request.urlopen(req, timeout=self.request.timeout)
+        # self.con = urllib_request.urlopen(req)
         self.response.headers = self._headers(self.con.info())
 
         if self.request.download:
@@ -153,7 +161,7 @@ class HTTP:
             if 'content-disposition' in self.response.headers:
                 r = RE['content-disposition'].search(self.response.headers['content-disposition'])
                 if r:
-                    name = urllib.unquote(r.group(1))
+                    name = unquote(r.group(1))
 
         while 1:
             buf = self.con.read(bs)
@@ -168,8 +176,9 @@ class HTTP:
         self.response.filename = self.request.download
 
     def _upload(self, upload, params):
+        from email.generator import _make_boundary
         res = []
-        boundary = mimetools.choose_boundary()
+        boundary = _make_boundary() # mimetools.choose_boundary()
         part_boundary = '--' + boundary
 
         if params:
@@ -190,11 +199,11 @@ class HTTP:
 
             if content_type:
                 res.append([part_boundary,
-                            'Content-Disposition: file; name="%s"; filename="%s"' % (name, urllib.quote(filename)),
+                            'Content-Disposition: file; name="%s"; filename="%s"' % (name, quote(filename)),
                             'Content-Type: %s' % content_type, '', body])
             else:
                 res.append([part_boundary,
-                            'Content-Disposition: file; name="%s"; filename="%s"' % (name, urllib.quote(filename)), '',
+                            'Content-Disposition: file; name="%s"; filename="%s"' % (name, quote(filename)), '',
                             body])
 
         result = list(itertools.chain(*res))

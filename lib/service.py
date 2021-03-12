@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
 
 import xbmc, sys
 
-from lib.torrent2http.remote.server import Server
-from lib.torrent2http.remote.log import debug
-
+from torrent2http.remote.server import Server
+from torrent2http.remote.log import debug
 
 def main():
 	debug('Starting server')
@@ -30,7 +30,7 @@ def main():
 	server.stop()
 
 if __name__ == '__main__':
-	from lib.torrent2http.remote.remotesettings import Settings
+	from .torrent2http.remote.remotesettings import Settings
 	s = Settings(None)
 
 	if s.role == 'server':

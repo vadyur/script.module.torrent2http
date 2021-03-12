@@ -1,6 +1,8 @@
 ﻿# -*- coding: utf-8 -*-
 
-import os, sys, log
+import os, sys
+
+from . import log
 
 __DEBUG__ = False
 
@@ -14,11 +16,15 @@ def get_filesystem_encoding():
 
 
 def ensure_unicode(string, encoding=get_filesystem_encoding()):
-	if isinstance(string, str):
-		string = string.decode(encoding)
-		
-	if __DEBUG__:
-		log.debug('\tensure_unicode(%s, encoding=%s)' % (string.encode('utf-8'), encoding))
+	if sys.version_info < (3, 0):
+		if isinstance(string, str):
+			string = string.decode(encoding)
+			
+		if __DEBUG__:
+			log.debug('\tensure_unicode(%s, encoding=%s)' % (string.encode('utf-8'), encoding))
+	else:
+		if isinstance(string, bytes):
+			string = string.decode('utf-8')
 		
 	return string
 

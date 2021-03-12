@@ -1,7 +1,9 @@
+from __future__ import absolute_import
+
 #import sys
 import os
-import xbmc, xbmcgui, xbmcvfs, xbmcaddon
-from net import HTTP
+import xbmc, xbmcvfs, xbmcaddon
+from .net import HTTP
 
 __libbaseurl__ = "https://github.com/DiMartinoXBMC/script.module.torrent2http/raw/master/bin"
 __settings__ = xbmcaddon.Addon(id='script.module.torrent2http')

@@ -1,8 +1,14 @@
-﻿import sys, os
+﻿from __future__ import absolute_import
+
+import sys, os
 
 current = os.path.dirname(__file__)
 
-sys.path.insert(0, os.path.normpath(os.path.join(current, '..')))
+pwd = os.getcwd()
+
+#sys.path.insert(0, os.path.normpath(os.path.join(current, '..')))
+sys.path.insert(0, os.path.normpath(os.path.join(current, '..', 'lib')))
+
 from service import main
 
 if not os.path.exists('temp'):

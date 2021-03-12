@@ -29,7 +29,10 @@ class AddonRO(object):
 
 		for item in self.root:
 			if item.get('id') == s:
-				return item.get('value').encode('utf-8')
+				try:
+					return item.get('value').encode('utf-8')
+				except:
+					return item.text
 		return u''
 
 

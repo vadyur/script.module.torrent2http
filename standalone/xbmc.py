@@ -27,17 +27,19 @@ def translatePath(path):
 	else:
 		raise Exception(path + ' is not valid')
 		
-	try:
-		path = path.encode('utf-8')
-	except:
-		pass
+	import sys
+	if sys.version_info < (3, 0):
+		try:
+			path = path.encode('utf-8')
+		except:
+			pass
 		
 	return path
 	
 	
 def log(msg, level=LOGNOTICE):
 	try:
-		print msg
+		print (msg)
 	except:
 		pass
 		
@@ -80,7 +82,7 @@ def executebuiltin(function, block=False):
 			zip_ref.extractall(dst)
 			zip_ref.close()
 		except BaseException as e:
-			print e
+			print (e)
 			raise
 
 	pass

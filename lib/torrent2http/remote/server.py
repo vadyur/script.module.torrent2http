@@ -3,14 +3,14 @@
 import threading
 from wsgiref.simple_server import make_server, WSGIRequestHandler
 
-from bottle import Bottle, ServerAdapter, response, redirect, abort
-from bottle import request #get, request, run, route # or route
+from .bottle import Bottle, ServerAdapter, response, redirect, abort
+from .bottle import request #get, request, run, route # or route
 
 import sys, xbmc, os
-from log import debug, print_tb
+from .log import debug, print_tb
 
-from parse import parse
-from remotesettings import Settings
+from .parse import parse
+from .remotesettings import Settings
 s = Settings(None)
 
 import bottle
@@ -222,7 +222,7 @@ class HTTP:
 			
 			host = ''
 			debug('find_free_port: ')
-			return str(find_free_port(host, xrange(5001, 5100)))
+			return str(find_free_port(host, range(5001, 5100)))
 		except BaseException as e:
 			print_tb(e)
 			return "0"
@@ -265,7 +265,7 @@ class Server:
 		self.server = BottleServer(host=s.remote_host, port=s.remote_port)
 		try:
 			app.run(server=self.server)
-		except Exception, e:
+		except Exception as e:
 			print_tb(e)
 		debug('Server stopped')
 		self.server = None

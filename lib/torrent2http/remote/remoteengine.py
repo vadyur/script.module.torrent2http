@@ -2,7 +2,7 @@
 from ..error import Error
 from ..util import ensure_fs_encoding
 
-import filesystem, log
+from . import filesystem, log
 import json, base64, urllib, os, time
 
 try:
@@ -102,7 +102,7 @@ class ClientEngine(Engine):
 
 	def MyPopen(self, args, **kwargs):
 		for i in args[1:]:
-			print i
+			print (i)
 
 		o = {"jsonrpc": "2.0", "method": "Addons.ExecuteAddon", "id": "2"}
 
@@ -120,7 +120,7 @@ class ClientEngine(Engine):
 		params = {"addonid":"script.module.torrent2http.remote", "params": {"args": args_str, 'torrent_data': tdata, "dict": dict_str }}
 		o['params'] = params
 
-		print o
+		print (o)
 
 		url = "http://%s:%d/popen" % (self.settings.remote_host, self.settings.remote_port)
 		try:
@@ -142,7 +142,7 @@ class ClientEngine(Engine):
 			return proc
 			
 		except requests.exceptions.RequestException as e:
-			print e
+			print (e)
 			
 		return None
 
@@ -164,7 +164,7 @@ class ClientEngine(Engine):
 				log.debug(r)
 				return r.text == 'True'
 		except requests.exceptions.RequestException as e:
-			print e
+			print (e)
 		return False
 
 	def find_free_port(self, host):
@@ -175,7 +175,7 @@ class ClientEngine(Engine):
 				log.debug(r)
 				return int(r.text)
 		except requests.exceptions.RequestException as e:
-			print e
+			print (e)
 		return False
 
 	def file_status(self, file_index, timeout=10):
@@ -270,7 +270,7 @@ class ClientEngine(Engine):
 		self._log("Invoking %s" % " ".join(args))
 		try:
 			self.process = self.MyPopen(args)
-		except OSError, e:
+		except OSError as e:
 			raise Error("Can't start torrent2http: %r" % e, Error.POPEN_ERROR)
 
 		start = time.time()
@@ -337,4 +337,4 @@ if __name__ == '__main__':
 	import sys
 
 	if len(sys.argv) > 2:
-		print sys.argv[2]
+		print (sys.argv[2])

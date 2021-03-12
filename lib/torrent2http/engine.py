@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import json
 import os
 import socket
@@ -6,18 +8,26 @@ import stat
 import subprocess
 import sys
 import time
-import urllib2
-import httplib
 from os.path import dirname
-from download import LibraryManager
+from .download import LibraryManager
 
-import logpipe
+if sys.version_info >= (3, 0):
+    from urllib import request as urllib_request
+    from urllib.parse import urlencode
+    import http.client as httplib
+else:
+    import urllib2 as urllib_request
+    from urllib import urlencode
+    import httplib
+
+
+from . import logpipe
 import mimetypes
 import xbmc
-from error import Error
-from platform import Platform
+from .error import Error
+from .platform import Platform
 from . import SessionStatus, FileStatus, PeerInfo, MediaType, Encryption
-from util import can_bind, find_free_port, ensure_fs_encoding
+from .util import can_bind, find_free_port, ensure_fs_encoding
 
 
 class Engine:
@@ -33,7 +43,7 @@ class Engine:
             try:
                 self._log("%s is not executable, trying to change its mode..." % path)
                 os.chmod(path, st.st_mode | stat.S_IEXEC)
-            except Exception, e:
+            except Exception as e:
                 self._log("Failed! Exception: %s" % str(e))
                 return False
             st = os.stat(path)
@@ -296,7 +306,9 @@ class Engine:
                         args.append("%s=false" % k)
                 else:
                     args.append(k)
-                    if isinstance(v, str) or isinstance(v, unicode):
+                    if sys.version_info >= (3, 0) and isinstance(v, str):
+                        pass
+                    if isinstance(v, str) or (sys.version_info < (3, 0) and isinstance(v, unicode) ):
                         v = ensure_fs_encoding(v)
                     else:
                         v = str(v)
@@ -312,7 +324,7 @@ class Engine:
         self.logpipe = logpipe.LogPipe(self._log)
         try:
             self.process = subprocess.Popen(args, stderr=self.logpipe, stdout=self.logpipe, startupinfo=startupinfo)
-        except OSError, e:
+        except OSError as e:
             raise Error("Can't start torrent2http: %r" % e, Error.POPEN_ERROR)
 
         start = time.time()
@@ -431,7 +443,7 @@ class Engine:
     def _decode(response):
         try:
             return json.loads(response)
-        except (KeyError, ValueError), e:
+        except (KeyError, ValueError) as e:
             raise Error("Can't decode response from torrent2http: %r" % e, Error.REQUEST_ERROR)
 
     def _request(self, cmd, timeout=None):
@@ -442,9 +454,9 @@ class Engine:
             kwargs = {}
             if timeout is not None:
                 kwargs['timeout'] = timeout
-            return urllib2.urlopen(url, **kwargs).read()
-        except (urllib2.URLError, httplib.HTTPException) as e:
-            if isinstance(e, urllib2.URLError) and isinstance(e.reason, socket.timeout):
+            return urllib_request.urlopen(url, **kwargs).read()
+        except (urllib_request.URLError, httplib.HTTPException) as e:
+            if isinstance(e, urllib_request.URLError) and isinstance(e.reason, socket.timeout):
                 raise Error("Timeout occurred while sending command '%s' to torrent2http" % cmd, Error.TIMEOUT)
             elif not self.is_alive() and self.started:
                 raise Error("torrent2http has crashed.", Error.CRASHED)
