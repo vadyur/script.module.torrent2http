@@ -297,7 +297,7 @@ class Engine:
         }
 
         args = [binary_path]
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             if v is not None:
                 if isinstance(v, bool):
                     if v:

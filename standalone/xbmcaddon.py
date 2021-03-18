@@ -2,7 +2,8 @@
 # A class to access addon properties.
 #
 
-import os, utils
+import os
+from . import utils
 import xml.etree.ElementTree as ET
 
 # ------------------------------------------------------------------------------------------------------------------- #

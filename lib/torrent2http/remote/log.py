@@ -9,10 +9,10 @@ import inspect
 prefix = 'script.module.torrent2http'
 
 def debug(s, line = None):
-
+	import sys
 	if isinstance(s, BaseException):
 		print_tb(s)
-	elif isinstance(s, unicode):
+	elif sys.version_info < (3, 0) and isinstance(s, unicode):
 		s = s.encode('utf-8')
 	elif not isinstance(s, str):
 		s = str(s)

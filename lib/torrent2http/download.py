@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, with_statement
 
 #import sys
 import os
@@ -15,11 +15,11 @@ def get_libname(platform):
 
 def log(msg):
     try:
-        xbmc.log("### [%s]: %s" % (__plugin__,msg,), level=xbmc.LOGNOTICE )
+        xbmc.log("### [{}]: {}".format(__plugin__,msg,) )
     except UnicodeEncodeError:
-        xbmc.log("### [%s]: %s" % (__plugin__,msg.encode("utf-8", "ignore"),), level=xbmc.LOGNOTICE )
+        xbmc.log("### [{}]: {}".format(__plugin__,msg.encode("utf-8", "ignore"),) )
     except:
-        xbmc.log("### [%s]: %s" % (__plugin__,'ERROR LOG',), level=xbmc.LOGNOTICE )
+        xbmc.log("### [{}]: {}".format(__plugin__,'ERROR LOG',) )
 
 def getSettingAsBool(setting):
     return __settings__.getSetting(setting).lower() == "true"
@@ -50,18 +50,29 @@ class LibraryManager():
             self.download()
 
     def download(self):
+        def failed(libname):
+            text = 'Failed download {}!'.format(libname)
+            xbmc.executebuiltin("XBMC.Notification({},{},{})".format(__plugin__,text,750))
+
         xbmcvfs.mkdirs(self.dest_path)
         for libname in get_libname(self.platform):
             dest = os.path.join(self.dest_path, libname)
-            log("try to fetch %s" % libname)
-            url = "%s/%s/%s.zip" % (__libbaseurl__, self.platform, libname)
+            log("try to fetch {}".format(libname))
+            url = "{}/{}/{}.zip".format(__libbaseurl__, self.platform, libname)
             try:
-                self.http = HTTP()
-                self.http.fetch(url, download=dest + ".zip", progress=True)
-                log("%s -> %s" % (url, dest))
-                xbmc.executebuiltin('XBMC.Extract("%s.zip","%s")' % (dest, self.dest_path), True)
-                xbmcvfs.delete(dest + ".zip")
+                import requests
+                r = requests.get(url)
+                if r.ok:
+                    path_to_zip_file = dest + ".zip"
+                    with open(path_to_zip_file, 'wb') as f:
+                        f.write(r.content)
+                        log("{} -> {}".format(url, dest))
+                        import zipfile
+                        with zipfile.ZipFile(path_to_zip_file, 'r') as zip_ref:
+                            zip_ref.extractall(self.dest_path)
+                        xbmcvfs.delete(path_to_zip_file)
+                else:
+                    failed(libname)
             except:
-                text = 'Failed download %s!' % libname
-                xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % (__plugin__,text,750))
+                failed(libname)
         return True

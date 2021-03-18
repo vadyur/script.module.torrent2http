@@ -30,7 +30,7 @@ def main():
 	server.stop()
 
 if __name__ == '__main__':
-	from .torrent2http.remote.remotesettings import Settings
+	from torrent2http.remote.remotesettings import Settings
 	s = Settings(None)
 
 	if s.role == 'server':

@@ -1,9 +1,14 @@
 import sys, json, base64, os
-import urlparse, urllib
+
+if sys.version_info >= (3, 0):
+	from urllib.parse import urljoin
+	from urllib.request import pathname2url
+else:
+	from urlparse import urljoin
+	from urllib import pathname2url
 
 def path2url(path):
-	return urlparse.urljoin('file:', urllib.pathname2url(path))
-
+	return urljoin('file:', pathname2url(path))
 
 def remote_t2h_torrent_path():
 	import xbmc
@@ -26,7 +31,7 @@ def parse(argv, s):
 		if i.startswith('dict='):
 			data = base64.b64decode(i[5:])
 			data = json.loads(data)
-			print data
+			print (data)
 
 	# import rpdb2
 	# rpdb2.start_embedded_debugger('pw')
@@ -77,7 +82,7 @@ def parse(argv, s):
 		e = ServerEngine(**data)
 		e.start(start_index=start_index)
 
-		print e
+		print (e)
 		
 		return e
 		

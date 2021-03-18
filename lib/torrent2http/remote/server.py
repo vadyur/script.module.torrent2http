@@ -13,7 +13,7 @@ from .parse import parse
 from .remotesettings import Settings
 s = Settings(None)
 
-import bottle
+from . import bottle
 bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024
 
 
@@ -27,8 +27,9 @@ function close_procces(pid) {
 '''
 
 def _TD_(val):
-	if isinstance(val, unicode):
-		val = val.encode('utf-8')
+	if sys.version < (3, 0):
+		if isinstance(val, unicode):
+			val = val.encode('utf-8')
 
 	return "<td>" + str(val) + "</td>"
 
