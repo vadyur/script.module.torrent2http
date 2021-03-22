@@ -8,7 +8,7 @@ import json, base64, urllib, os, time
 try:
 	import requests
 except ImportError:
-	import sys, xbmc
+	import sys, xbmc	# type: ignore
 	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.requests","lib")
 	if os.path.exists(req_path):
 		sys.path.append(req_path)
@@ -63,7 +63,7 @@ class RemoteProcess:
 class ClientEngine(Engine):
 
 	def __init__(self, *args, **kwargs):
-		from remotesettings import Settings
+		from .remotesettings import Settings
 		self.settings = Settings()
 
 		kwargs['bind_host'] = self.settings.remote_host
@@ -181,19 +181,20 @@ class ClientEngine(Engine):
 	def file_status(self, file_index, timeout=10):
 		fs = Engine.file_status(self, file_index, timeout)
 
-		from torrent2http import FileStatus
+		from ...torrent2http import FileStatus
 		
 		try:
 			url = None
 			if fs.url:
-				import urlparse, re
-				res = urlparse.urlparse(fs.url)
+				import re
+				from urllib.parse import urlparse, urlunparse, ParseResult
+				res = urlparse(fs.url)
 				port = re.search(r':(\d+)', res.netloc).group(1)
 
-				res = urlparse.ParseResult(res.scheme, 
+				res = ParseResult(res.scheme, 
 											'%s:%s' % (self.settings.remote_host, port), 
 											res.path, res.params, res.query, res.fragment)
-				url=urlparse.urlunparse(res)
+				url = urlunparse(res)
 
 			return FileStatus(index=fs.index, name=fs.name, save_path=fs.save_path, url=url,
 		                  size=fs.size, offset=fs.offset, download=fs.download, progress=fs.progress, media_type=fs.media_type)
@@ -261,7 +262,7 @@ class ClientEngine(Engine):
 						args.append("%s=false" % k)
 				else:
 					args.append(k)
-					if isinstance(v, str) or isinstance(v, unicode):
+					if isinstance(v, str):
 						v = ensure_fs_encoding(v)
 					else:
 						v = str(v)
@@ -307,7 +308,7 @@ class ClientEngine(Engine):
 			
 class ServerEngine(Engine):
 	def __init__(self, **kwargs):
-		from remotesettings import Settings
+		from .remotesettings import Settings
 		self.settings = Settings()
 
 		if 'resume_file' in kwargs:

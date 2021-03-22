@@ -3,7 +3,12 @@
 #
 
 import os
-from . import utils
+
+try:
+	from . import utils
+except ImportError:
+	import utils	# type: ignore
+
 import xml.etree.ElementTree as ET
 
 # ------------------------------------------------------------------------------------------------------------------- #

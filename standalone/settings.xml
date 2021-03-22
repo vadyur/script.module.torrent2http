@@ -1,6 +1,6 @@
 <settings>
-    <setting id="remote_host" value="192.168.1.10" />
-    <setting id="remote_port" value="2828" />
+    <setting id="remote_host" value="192.168.1.5" />
+    <setting id="remote_port" value="2929" />
     <setting id="role" value="server" />
-    <setting id="storage_path" value="./cache" />
+    <setting id="storage_path" value="/media/vd/D/Video" />
 </settings>
