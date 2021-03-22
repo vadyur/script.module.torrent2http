@@ -113,7 +113,7 @@ class Engine:
         return binary_path
 
     def __init__(self, uri=None, binaries_path=None, platform=None, download_path=".",
-                 bind_host='127.0.0.1', bind_port=5001, connections_limit=None, download_kbps=None, upload_kbps=None,
+                 bind_host='127.0.0.1', bind_port=5010, connections_limit=None, download_kbps=None, upload_kbps=None,
                  enable_dht=True, enable_lsd=True, enable_natpmp=True, enable_upnp=True, enable_scrape=False,
                  log_stats=False, encryption=Encryption.ENABLED, keep_complete=False, keep_incomplete=False,
                  keep_files=False, log_files_progress=False, log_overall_progress=False, log_pieces_progress=False,

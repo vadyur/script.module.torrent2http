@@ -11,7 +11,7 @@ def path2url(path):
 	return urljoin('file:', pathname2url(path))
 
 def remote_t2h_torrent_path():
-	import xbmc
+	import xbmc		# type: ignore
 	return xbmc.translatePath('special://temp/rt2h.torrent')
 
 	
@@ -78,7 +78,7 @@ def parse(argv, s):
 		if bind_port:
 			data['bind_port'] = bind_port
 
-		from remoteengine import ServerEngine
+		from torrent2http.remote.remoteengine import ServerEngine
 		e = ServerEngine(**data)
 		e.start(start_index=start_index)
 
