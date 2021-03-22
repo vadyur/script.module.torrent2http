@@ -6,7 +6,7 @@ from . import filesystem, log
 import json, base64, urllib, os, time
 
 try:
-	import requests
+	import requests		# type: ignore
 except ImportError:
 	import sys, xbmc	# type: ignore
 	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.requests","lib")
@@ -16,7 +16,7 @@ except ImportError:
 	if os.path.exists(req_path):
 		sys.path.append(req_path)
 	try:
-		import requests
+		import requests	# type: ignore
 	except ImportError:
 		pass
 
@@ -90,7 +90,8 @@ class ClientEngine(Engine):
 
 	@staticmethod
 	def _torrent_data_by_url(url):
-		path = urllib.url2pathname(url.replace('file:', '')).decode('utf-8')
+		from urllib.request import url2pathname
+		path = url2pathname(url.replace('file:', ''))
 		if filesystem.exists(path):
 			with filesystem.fopen(path, 'rb') as t:
 				return t.read()
@@ -112,9 +113,9 @@ class ClientEngine(Engine):
 			tdata = base64.b64encode(tdata)
 
 		args_str = json.dumps(args[1:])
-		args_str = base64.b64encode(args_str)
+		args_str = base64.b64encode(args_str.encode('utf-8'))
 		dict_str = self.sobj
-		dict_str = base64.b64encode(dict_str)
+		dict_str = base64.b64encode(dict_str.encode('utf-8'))
 
 
 		params = {"addonid":"script.module.torrent2http.remote", "params": {"args": args_str, 'torrent_data': tdata, "dict": dict_str }}
@@ -253,7 +254,7 @@ class ClientEngine(Engine):
 		}
 
 		args = []
-		for k, v in kwargs.iteritems():
+		for k, v in kwargs.items():
 			if v is not None:
 				if isinstance(v, bool):
 					if v:

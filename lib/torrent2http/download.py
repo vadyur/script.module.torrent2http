@@ -60,7 +60,7 @@ class LibraryManager():
             log("try to fetch {}".format(libname))
             url = "{}/{}/{}.zip".format(__libbaseurl__, self.platform, libname)
             try:
-                import requests
+                import requests         # type: ignore
                 r = requests.get(url)
                 if r.ok:
                     path_to_zip_file = dest + ".zip"
