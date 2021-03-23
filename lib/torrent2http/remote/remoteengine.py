@@ -182,7 +182,7 @@ class ClientEngine(Engine):
 	def file_status(self, file_index, timeout=10):
 		fs = Engine.file_status(self, file_index, timeout)
 
-		from ...torrent2http import FileStatus
+		from torrent2http import FileStatus
 		
 		try:
 			url = None
