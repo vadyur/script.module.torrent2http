@@ -1,8 +1,14 @@
 ﻿import xbmcaddon, xbmc
 
 from .filesystem import ensure_unicode, abspath
+from sys import version_info
 
-_bin_dir = ensure_unicode(xbmc.translatePath('special://home/addons/script.module.torrent2http/bin'))
+try:
+    from xbmcvfs import translatePath
+except ImportError:
+    from xbmc import translatePath
+
+_bin_dir = ensure_unicode(translatePath('special://home/addons/script.module.torrent2http/bin'))
 print (_bin_dir)
 
 _ADDON_NAME = 'script.module.torrent2http'
