@@ -11,8 +11,11 @@ def path2url(path):
 	return urljoin('file:', pathname2url(path))
 
 def remote_t2h_torrent_path():
-	import xbmc		# type: ignore
-	return xbmc.translatePath('special://temp/rt2h.torrent')
+	try:
+		from xbmc import translatePath
+	except ImportError:
+		from xbmcvfs import translatePath
+	return translatePath('special://temp/rt2h.torrent')
 
 	
 def parse(argv, s):

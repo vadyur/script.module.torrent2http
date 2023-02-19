@@ -20,7 +20,6 @@ else:
     from urllib import urlencode
     import httplib
 
-
 from . import logpipe
 import mimetypes
 import xbmc
@@ -226,8 +225,13 @@ class Engine:
         :param path: Download path
         :return: Translated path
         """
+        try:
+            from xbmc import translatePath
+        except ImportError:
+            from xbmcvfs import translatePath
+
         import xbmc
-        path = xbmc.translatePath(path)
+        path = translatePath(path)
         if "://" in path:
             if sys.platform.startswith('win') and path.lower().startswith("smb://"):
                 path = path.replace("smb:", "").replace("/", "\\")

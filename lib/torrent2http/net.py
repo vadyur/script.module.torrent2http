@@ -11,6 +11,11 @@ import xbmc
 import xbmcgui
 import xbmcvfs
 
+try:
+    from xbmc import translatePath
+except ImportError:
+    from xbmcvfs import translatePath
+
 import sys
 if sys.version_info >= (3, 0):
     from urllib import request as urllib_request
@@ -34,7 +39,7 @@ RE = {
 
 class HTTP:
     def __init__(self):
-        self._dirname = xbmc.translatePath('special://temp')
+        self._dirname = translatePath('special://temp')
         for subdir in ('xbmcup', 'script.module.libtorrent'):
             self._dirname = os.path.join(self._dirname, subdir)
             if not xbmcvfs.exists(self._dirname):

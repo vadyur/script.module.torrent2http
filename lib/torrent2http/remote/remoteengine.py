@@ -9,10 +9,16 @@ try:
 	import requests		# type: ignore
 except ImportError:
 	import sys, xbmc	# type: ignore
-	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.requests","lib")
+
+	try:
+		from xbmc import translatePath
+	except ImportError:
+		from xbmcvfs import translatePath
+
+	req_path = os.path.join(translatePath("special://home/addons"), "script.module.requests","lib")
 	if os.path.exists(req_path):
 		sys.path.append(req_path)
-	req_path = os.path.join(xbmc.translatePath("special://home/addons"), "script.module.urllib3", "lib")
+	req_path = os.path.join(translatePath("special://home/addons"), "script.module.urllib3", "lib")
 	if os.path.exists(req_path):
 		sys.path.append(req_path)
 	try:
