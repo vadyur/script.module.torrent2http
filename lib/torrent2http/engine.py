@@ -53,7 +53,7 @@ class Engine:
                 self._log("Failed")
                 return False
         return True
-    
+
     def _log(self, message):
         if self.logger:
             self.logger(message)
@@ -407,7 +407,7 @@ class Engine:
                    for index, f in enumerate(files)]
             if media_types is not None:
                 res = filter(lambda fs: fs.media_type in media_types, res)
-            return res
+            return list(res)
 
     def file_status(self, file_index, timeout=10):
         """
