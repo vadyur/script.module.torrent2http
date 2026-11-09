@@ -16,7 +16,12 @@ except ImportError:
     # Platform doesn't support dynamic loading.
     create_dynamic = None
 
-from importlib._bootstrap import _ERR_MSG, _exec, _load, _builtin_from_name
+try:
+    from importlib._bootstrap import _ERR_MSG, _exec, _load, _builtin_from_name
+except ImportError:
+    # Python 3.12 renamed _ERR_MSG to _ERR_MSG_PREFIX
+    from importlib._bootstrap import _exec, _load, _builtin_from_name
+    _ERR_MSG = 'No module named {!r}'
 from importlib._bootstrap_external import SourcelessFileLoader
 
 from importlib import machinery
